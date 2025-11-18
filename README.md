@@ -155,3 +155,90 @@ type Product = {
 TypeScript-এ interface এবং type উভয়ই গুরুত্বপূর্ণ।
 Interface বিশেষভাবে object, class এবং structure-এর জন্য উপযোগী।
 Type বেশি versatile union, intersection, API response, primitive alias–এ অসাধারণ কাজ করে।
+
+
+2. What is the use of the keyof keyword in TypeScript? Provide an example. 
+
+## keyof keyword
+
+TypeScript-এর একটি বিশেষ বৈশিষ্ট্য হলো এর টাইপ সিস্টেম, যা ডেভেলপারদের আরও নিরাপদ এবং নির্ভুল কোড লেখায় সাহায্য করে। এই টাইপ সিস্টেমের একটি শক্তিশালী অংশ হলো keyof কীওয়ার্ড। অনেক নতুন ডেভেলপার TypeScript ব্যবহার শুরু করলেও keyof এর আসল শক্তি ও প্রয়োজনীয়তা সম্পর্কে ভালোভাবে জানে না। আজকের এই ব্লগে আমি দেখাবো keyof কী, কেন এটি ব্যবহার করা হয়, এবং real-time project এটি কীভাবে কাজে লাগে।
+
+### keyof কী?
+
+keyof হলো TypeScript-এর একটি অপারেটর, যা কোনো object type-এর সমস্ত property key-কে একটি union টাইপ হিসেবে রিটার্ন করে। সহজভাবে বললে যে অবজেক্টের key আছে, keyof সেগুলোকে string literal টাইপ বানিয়ে দেয়।
+
+### Example:
+
+```ts
+type User = {
+  name: string;
+  age: number;
+  email: string;
+};
+type UserKeys = keyof User;
+```
+
+এখন UserKeys হয়ে যাবে: "name" | "age" | "email" অর্থাৎ TypeScript এখন জানে, এই টাইপ ব্যবহার করলে key শুধু এই তিনটির একটি হতে পারবে।
+
+### keyof ব্যবহার করার প্রধান সুবিধাগুলো হলো:
+
+- Object-এর key গুলো dynamically access করতে সাহায্য করে
+- যখন আমরা কোনো ফাংশন থেকে object-এর কোনো property পড়তে চাই, তখন keyof ব্যবহার করলে TypeScript নিশ্চিত করে যে ভুল key ব্যবহার করা যাবে না।
+- কোড আরও টাইপ-সেফ এবং predictability বাড়ে
+- এটি runtime error হওয়ার সম্ভাবনা কমায়।
+- Reusable এবং Flexible ফাংশন তৈরি করা যায়
+- একটি ফাংশন লিখে সেটি বিভিন্ন object-এর জন্য ব্যবহার করা যায়।
+- Generic টাইপের সাথে দুর্দান্ত কাজ করে
+- Generics + keyof → অত্যন্ত শক্তিশালী combination।
+
+## Real-Time Example:
+
+ধরুন আপনি একটি ই-কমার্স ওয়েবসাইট তৈরি করছেন। সেখানে একটি Product অবজেক্ট আছে:
+
+```ts
+type Product = {
+  id: number;
+  title: string;
+  price: number;
+  stock: number;
+};
+```
+
+এখন আপনি এমন একটি ফাংশন তৈরি করতে চান, যা যে কোনো Product-এর যে কোনো property ডায়নামিকভাবে রিটার্ন করবে।এই ধরনের ফাংশন সাধারণভাবে করলে ভুল key দিলে runtime error হতে পারে।
+কিন্তু TypeScript-এর keyof ব্যবহার করলে compile time-এই ভুল ধরা পড়ে যাবে। ফাংশনটি লিখি:
+
+```ts
+function getProductValue<T, K extends keyof T>(product: T, key: K): T[K] {
+  return product[key];
+}
+```
+
+### এখন এই ফাংশনটি পুরোপুরি টাইপ-সেফ।
+
+```ts
+const p: Product = {
+  id: 101,
+  title: "Wireless Headphone",
+  price: 3500,
+  stock: 15,
+};
+const priceValue = getProductValue(p, "price");
+const titleValue = getProductValue(p, "title");  
+```
+
+### এখানে কী ঘটছে?
+
+keyof Product হলো "id" | "title" | "price" | "stock" । তাই getProductValue ফাংশনে ভুল key পাঠানো যাবে না। ফাংশনটি সঠিক টাইপ রিটার্ন করবে (string, number যা property অনুযায়ী)।
+এটি TypeScript-কে আরও শক্তিশালী করে তোলে।
+
+### কোথায় keyof বেশি ব্যবহৃত হয়:
+
+- API Response Validation
+- Dynamic Form Builder
+- Search Filters (যেখানে key ডায়নামিক)
+- Reusable Generic Utility Functions
+- Mapping Object Keys
+- Object Transformation Functions
+
+TypeScript-এর keyof অপারেটর JavaScript অবজেক্টের কাঠামোকে আরও ভালোভাবে নিয়ন্ত্রণ করতে সাহায্য করে। এটি ডেভেলপারদের টাইপ-সেফ ও error-free কোড লিখতে সহায়তা করে। বড় অ্যাপ্লিকেশনে, বিশেষ করে ই-কমার্স, ড্যাশবোর্ড, CRM অ্যাপ্লিকেশনে keyof অত্যন্ত কাজে লাগে। এটি object-এর key-কে টাইপ হিসেবে ব্যবহার করে, ফলে ভুল key ব্যবহার করলে আগে থেকেই error পাওয়া যায়। তাই keyof TypeScript-এর সবচেয়ে শক্তিশালী টাইপ টুলগুলোর একটি।
+
