@@ -3,7 +3,6 @@ function formatValue(value: string | number | boolean) {
     return value.toLocaleUpperCase();
   }
   if (typeof value === "number") {
-    6;
     return value * 10;
   }
   if (typeof value === "boolean") {
